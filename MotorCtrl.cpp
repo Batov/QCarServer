@@ -1,18 +1,21 @@
-#include "CarMotor.hpp"
+#include "MotorCtrl.hpp"
 
-CarMotor::CarMotor(const QString& name, char jack):
+Motor::Motor(char jack):
 m_power(0),
-m_name(name),
 m_jack(jack)
 {
 	setPower(0);
 }
 
-void CarMotor::setPower(int _power)
+void Motor::setPower(int _power)
 {
 }
 
-void CarMotor::emergencyStop()
+void Motor::setPeriod(int _period)
+{
+}
+
+void Motor::emergencyStop()
 {
 	setPower(0);
 }

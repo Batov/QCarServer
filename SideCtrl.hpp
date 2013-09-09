@@ -2,15 +2,15 @@
 
 //#include <QFile>
 //#include <QSettings>
+#include "MotorCtrl.hpp"
 
-class Motor : public QObject
+class Side : public QObject
 {
 	Q_OBJECT
 public:
-	Motor(char jack);
+	Side(char central,char edge);
 
 	void setPower(int _power); 
-	void setPeriod(int _period);
 
 public slots:
 	void emergencyStop();
@@ -19,6 +19,7 @@ signals:
 	void toLog(QString msg);
 
 protected:
-	unsigned char m_jack; 
-	int m_power;
+	int s_power;
+	Motor* s_motor_for_central_wheel;
+	Motor* s_motor_for_edge_wheels;
 };

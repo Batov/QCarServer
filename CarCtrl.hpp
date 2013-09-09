@@ -20,7 +20,7 @@ public:
 	QSettings* getSettings() { return m_settings; } 
 
 public slots:
-	//void qrealResponce(const QByteArray& a);
+	void qrealResponce(const QByteArray& a);
 	void emergencyStop();
 
 protected slots:
@@ -33,7 +33,7 @@ protected slots:
 signals:
 
 protected:
-	QMap<QString, CarMotor*> m_motors;
+	QMap<QString, Side*> m_sides;
 
 	QSettings* m_settings;
 	QSettings* m_defaultSettings;
