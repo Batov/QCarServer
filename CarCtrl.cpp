@@ -43,10 +43,8 @@ void CarCtrl::initSettings()
 	m_defaultSettings->setValue("Period", 20000 );
 	m_defaultSettings->endGroup();
 
-	m_defaultSettings->beginGroup("i2cConnection");
 	m_defaultSettings->setValue("DevPath", "/dev/i2c-2");
 	m_defaultSettings->setValue("DevId", 0x48);
-	m_defaultSettings->endGroup();
 
 	m_defaultSettings->setValue("ConnectionPort", 4444);
 
@@ -73,23 +71,27 @@ void CarCtrl::initSides()
 	for (int i = 0; i < sidesKeys.size(); ++i) 
 	{
 		QString name = sidesKeys[i];
+
 		m_settings->beginGroup(name);
 		char Center = m_settings->value("CentralWheel").toChar().toAscii();
 		char Edge = m_settings->value("EdgesWheels").toChar().toAscii();
 		int Period = m_settings->value("Period").toInt();
+		m_settings->endGroup();
+
 		QString DevPath  = m_settings->value("DevPath");
 		int DevId = m_settings->value("DevId").toInt();
 		i2cConnection* i2cCon = new i2cConnection(DevPath,DevId);
 		Side* side = new Side(Center,Edge,Period,i2cCon);
-		m_settings->endGroup();
+		
 	}
 
 }
 
 void CarCtrl::emergencyStop()
 {
-	CarMotor* sides;
-	foreach (side, m_sides) {
+	Side* side;
+	foreach (side, m_sides) 
+	{
 		side->setPower(0);
 	}
 }
@@ -129,31 +131,27 @@ void CarCtrl::onQRealNetworkRead()
 		QStringList cmd = command.split(" ", QString::SkipEmptyParts);
 
 		QString commandName = cmd.at(0).trimmed();
-		if (m_motors.contains(commandName)) {
-			if (!m_autopilot){
-				m_motors[commandName]->invoke(cmd.at(1).toInt());
-			}
-		}
-		else if (m_sensors.contains(commandName)) {
-			if (!m_autopilot){
-				qrealResponce(m_sensors[commandName]->getByteValue());
-			}
-		}
-		else if (commandName == "sound" || commandName == "beep") {
-			m_autopilot = !m_autopilot;
-			qDebug() << "Unknown command: ";
-			if (m_autopilot){
-				m_timerId = startTimer(20);
 
-			}
-			else 
-			{
-				killTimer(m_timerId);
-				m_timerId =-1;
-				this->emergencyStop();
-			}
-			//	playSound(m_settings->value("SoundFile").toString());
+		if (m_sides.contains(commandName)) 
+		{
+			m_sides[commandName]->setPower(cmd.at(1).toInt());
 		}
+		//what the fuck?
+		// else if (commandName == "sound" || commandName == "beep") {
+		// 	m_autopilot = !m_autopilot;
+		// 	qDebug() << "Unknown command: ";
+		// 	if (m_autopilot){
+		// 		m_timerId = startTimer(20);
+
+		// 	}
+		// 	else 
+		// 	{
+		// 		killTimer(m_timerId);
+		// 		m_timerId =-1;
+		// 		this->emergencyStop();
+		// 	}
+		// 	//	playSound(m_settings->value("SoundFile").toString());
+		//}
 		else {
 			qDebug() << "Unknown command: " + cmd.at(0);
 		}
