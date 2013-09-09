@@ -8,9 +8,10 @@
 #include <unistd.h>
 #include <linux/input.h>
 
-CarCtrl::Car() :
+CarCtrl::CarCtrl() :
 	m_qrealServer(),
-	m_sides()
+	m_sides(),
+	m_timerId(-1)
 {
 	initSettings();
 	initSides();
@@ -42,6 +43,11 @@ void CarCtrl::initSettings()
 	m_defaultSettings->setValue("Period", 20000 );
 	m_defaultSettings->endGroup();
 
+	m_defaultSettings->beginGroup("i2cConnection");
+	m_defaultSettings->setValue("DevPath", "/dev/i2c-2");
+	m_defaultSettings->setValue("DevId", 0x48);
+	m_defaultSettings->endGroup();
+
 	m_defaultSettings->setValue("ConnectionPort", 4444);
 
 	m_settings = new QSettings(QApplication::applicationDirPath() + "/config.ini", QSettings::IniFormat);
@@ -64,12 +70,17 @@ void CarCtrl::initSides()
 	QStringList sidesKeys = m_settings->allKeys();
 	m_settings->endGroup();
 
-	for (int i = 0; i < sidesKeys.size(); ++i) {
+	for (int i = 0; i < sidesKeys.size(); ++i) 
+	{
 		QString name = sidesKeys[i];
 		m_settings->beginGroup(name);
 		char Center = m_settings->value("CentralWheel").toChar().toAscii();
 		char Edge = m_settings->value("EdgesWheels").toChar().toAscii();
-		Side* side = new Side(Center,Edge);
+		int Period = m_settings->value("Period").toInt();
+		QString DevPath  = m_settings->value("DevPath");
+		int DevId = m_settings->value("DevId").toInt();
+		i2cConnection* i2cCon = new i2cConnection(DevPath,DevId);
+		Side* side = new Side(Center,Edge,Period,i2cCon);
 		m_settings->endGroup();
 	}
 

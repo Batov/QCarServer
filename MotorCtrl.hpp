@@ -7,7 +7,7 @@ class Motor : public QObject
 {
 	Q_OBJECT
 public:
-	Motor(char jack);
+	Motor(char jack,int period, i2cConnection* i2cCon);
 
 	void setPower(int _power); 
 	void setPeriod(int _period);
@@ -21,4 +21,5 @@ signals:
 protected:
 	unsigned char m_jack; 
 	int m_power;
+	i2cConnection* m_i2cCon;
 };

@@ -4,7 +4,8 @@
 #include <QSocketNotifier>
 #include <QSettings>
 
-#include "CarMotor.hpp"
+#include "SideCtrl.hpp"
+#include "i2cConnection.hpp"
 
 #if QT_VERSION >= 0x050000  // wtf?
 #include <QApplication>
@@ -16,7 +17,7 @@ class Car : public QObject
 {
 	Q_OBJECT
 public:
-	Car();
+	CarCtrl();
 	QSettings* getSettings() { return m_settings; } 
 
 public slots:
@@ -33,6 +34,7 @@ protected slots:
 signals:
 
 protected:
+	void timerEvent(QTimerEvent *event);
 	QMap<QString, Side*> m_sides;
 
 	QSettings* m_settings;
@@ -40,4 +42,5 @@ protected:
 
 	QTcpServer  m_qrealServer;
 	QTcpSocket* m_qrealConnection;
+	int m_timerId;
 };
