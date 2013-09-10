@@ -2,11 +2,12 @@
 #include <QtNetwork/QTcpSocket>
 
 #include <cmath>
-#include "CarCtrl.hpp"
-#include "Sensor.hpp"
 #include <fcntl.h>
 #include <unistd.h>
 #include <linux/input.h>
+
+#include "CarCtrl.hpp"
+#include "I2cConnection.hpp"
 
 CarCtrl::CarCtrl() :
 	m_qrealServer(),
@@ -78,9 +79,9 @@ void CarCtrl::initSides()
 		int Period = m_settings->value("Period").toInt();
 		m_settings->endGroup();
 
-		QString DevPath  = m_settings->value("DevPath");
+		QString DevPath  = m_settings->value("DevPath").toString();
 		int DevId = m_settings->value("DevId").toInt();
-		i2cConnection* i2cCon = new i2cConnection(DevPath,DevId);
+		I2cConnection* i2cCon = new I2cConnection(DevPath,DevId);
 		Side* side = new Side(Center,Edge,Period,i2cCon);
 		
 	}

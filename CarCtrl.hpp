@@ -3,9 +3,10 @@
 #include <QTcpServer>
 #include <QSocketNotifier>
 #include <QSettings>
+#include <QVector3D>
 
 #include "SideCtrl.hpp"
-#include "i2cConnection.hpp"
+
 
 #if QT_VERSION >= 0x050000  // wtf?
 #include <QApplication>
@@ -13,7 +14,7 @@
 #include <QtGui/QApplication>
 #endif
 
-class Car : public QObject
+class CarCtrl : public QObject
 {
 	Q_OBJECT
 public:
@@ -28,13 +29,13 @@ protected slots:
 	void onQRealConnection();
 	void onQRealDisconnected();
 	void onQRealNetworkRead();
-	void initMotors();
+	void initSides();
 	void initSettings();
 
 signals:
 
 protected:
-	void timerEvent(QTimerEvent *event);
+	//void timerEvent(QTimerEvent *event);
 	QMap<QString, Side*> m_sides;
 
 	QSettings* m_settings;
