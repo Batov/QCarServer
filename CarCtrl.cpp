@@ -10,77 +10,77 @@
 #include "I2cConnection.hpp"
 
 CarCtrl::CarCtrl() :
-	m_qrealServer(),
-	m_sides(),
-	m_timerId(-1)
+	c_Server(),
+	c_sides(),
+	c_timerId(-1)
 {
 	initSettings();
 	initSides();
 
-	m_qrealConnection = new QTcpSocket();
-	m_qrealServer.listen(QHostAddress::Any, m_settings->value("ConnectionPort").toInt());
-	connect(&m_qrealServer, SIGNAL(newConnection()), this, SLOT(onQRealConnection()));
+	c_Connection = new QTcpSocket();
+	c_Server.listen(QHostAddress::Any, c_settings->value("ConnectionPort").toInt());
+	connect(&c_Server, SIGNAL(newConnection()), this, SLOT(Connection()));
 }
 
 void CarCtrl::initSettings()
 {
-	m_defaultSettings = new QSettings(this);
+	c_defaultSettings = new QSettings(this);
 
 	// default settings init
-	m_defaultSettings->beginGroup("SidesKeys");
-	m_defaultSettings->setValue("left", 0);
-	m_defaultSettings->setValue("right", 1);
-	m_defaultSettings->endGroup();
+	c_defaultSettings->beginGroup("SidesKeys");
+	c_defaultSettings->setValue("left", 0);
+	c_defaultSettings->setValue("right", 1);
+	c_defaultSettings->endGroup();
 
-	m_defaultSettings->beginGroup("left"); 
-	m_defaultSettings->setValue("CentralWheel", 1 );
-	m_defaultSettings->setValue("EdgesWheels", 2);
-	m_defaultSettings->setValue("Period", 20000 );
-	m_defaultSettings->endGroup();
+	c_defaultSettings->beginGroup("left"); 
+	c_defaultSettings->setValue("CentralWheel", 1 );
+	c_defaultSettings->setValue("EdgesWheels", 2);
+	c_defaultSettings->setValue("Period", 20000 );
+	c_defaultSettings->endGroup();
 
-	m_defaultSettings->beginGroup("right");
-	m_defaultSettings->setValue("CentralWheel", 3 );
-	m_defaultSettings->setValue("EdgesWheels", 4);
-	m_defaultSettings->setValue("Period", 20000 );
-	m_defaultSettings->endGroup();
+	c_defaultSettings->beginGroup("right");
+	c_defaultSettings->setValue("CentralWheel", 3 );
+	c_defaultSettings->setValue("EdgesWheels", 4);
+	c_defaultSettings->setValue("Period", 20000 );
+	c_defaultSettings->endGroup();
 
-	m_defaultSettings->setValue("DevPath", "/dev/i2c-2");
-	m_defaultSettings->setValue("DevId", 0x48);
+	c_defaultSettings->setValue("DevPath", "/dev/i2c-2");
+	c_defaultSettings->setValue("DevId", 0x48);
 
-	m_defaultSettings->setValue("ConnectionPort", 4444);
+	c_defaultSettings->setValue("ConnectionPort", 4444);
 
-	m_settings = new QSettings(QApplication::applicationDirPath() + "/config.ini", QSettings::IniFormat);
+	c_settings = new QSettings(QApplication::applicationDirPath() + "/config.ini", QSettings::IniFormat);
 
-	if (m_settings->allKeys().count() == 0) {
+	if (c_settings->allKeys().count() == 0) {
 		// use default
-		QStringList keys = m_defaultSettings->allKeys();
+		QStringList keys = c_defaultSettings->allKeys();
 		for (unsigned int i = 0; i < keys.count(); ++i) {
-			m_settings->setValue(keys.at(i), m_defaultSettings->value(keys.at(i)));
+			c_settings->setValue(keys.at(i), c_defaultSettings->value(keys.at(i)));
 		}
 	}
 
-	m_settings->setFallbacksEnabled(false);
-	m_settings->sync();
+	c_settings->setFallbacksEnabled(false);
+	c_settings->sync();
 }
 
 void CarCtrl::initSides()
 {
-	m_settings->beginGroup("SidesKeys");
-	QStringList sidesKeys = m_settings->allKeys();
-	m_settings->endGroup();
+	c_settings->beginGroup("SidesKeys");
+	QStringList sidesKeys = c_settings->allKeys();
+	c_settings->endGroup();
 
 	for (int i = 0; i < sidesKeys.size(); ++i) 
 	{
 		QString name = sidesKeys[i];
 
-		m_settings->beginGroup(name);
-		char Center = m_settings->value("CentralWheel").toChar().toAscii();
-		char Edge = m_settings->value("EdgesWheels").toChar().toAscii();
-		int Period = m_settings->value("Period").toInt();
-		m_settings->endGroup();
+		c_settings->beginGroup(name);
+		char Center = c_settings->value("CentralWheel").toChar().toAscii();
+		char Edge = c_settings->value("EdgesWheels").toChar().toAscii();
+		int Period = c_settings->value("Period").toInt();
+		c_settings->endGroup();
 
-		QString DevPath  = m_settings->value("DevPath").toString();
-		int DevId = m_settings->value("DevId").toInt();
+		QString DevPath  = c_settings->value("DevPath").toString();
+		int DevId = c_settings->value("DevId").toInt();
 		I2cConnection* i2cCon = new I2cConnection(DevPath,DevId);
 		Side* side = new Side(Center,Edge,Period,i2cCon);
 		
@@ -91,51 +91,51 @@ void CarCtrl::initSides()
 void CarCtrl::emergencyStop()
 {
 	Side* side;
-	foreach (side, m_sides) 
+	foreach (side, c_sides) 
 	{
 		side->setPower(0);
 	}
 }
 
-void CarCtrl::onQRealConnection()
+void CarCtrl::Connection()
 {
-	if (m_qrealConnection->isValid())
-		qDebug() << "Replacing existing QReal connection";
-	m_qrealConnection = m_qrealServer.nextPendingConnection();
-	qDebug() << "Accepted new QReal connection";
-	m_qrealConnection->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-	connect(m_qrealConnection, SIGNAL(disconnected()), this, SLOT(onQRealDisconnected()));
-	connect(m_qrealConnection, SIGNAL(readyRead()), this, SLOT(onQRealNetworkRead()));
+	if (c_Connection->isValid())
+		qDebug() << "Replacing existing connection";
+	c_Connection = c_Server.nextPendingConnection();
+	qDebug() << "Accepted new connection";
+	c_Connection->setSocketOption(QAbstractSocket::LowDelayOption, 1);
+	connect(c_Connection, SIGNAL(disconnected()), this, SLOT(Disconnected()));
+	connect(c_Connection, SIGNAL(readyRead()), this, SLOT(NetworkRead()));
 }
 
-void CarCtrl::onQRealDisconnected()
+void CarCtrl::Disconnected()
 {
-	qDebug() << "Existing QReal connection disconnected";
-	m_qrealConnection->disconnectFromHost();
+	qDebug() << "Disconnected";
+	c_Connection->disconnectFromHost();
 }
 
-void CarCtrl::qrealResponce(const QByteArray& a)
+void CarCtrl::Responce(const QByteArray& a)
 {
-	m_qrealConnection->write(a);
+	c_Connection->write(a);
 }
 
-void CarCtrl::onQRealNetworkRead()
+void CarCtrl::NetworkRead()
 {
-	if (!m_qrealConnection->isValid())
+	if (!c_Connection->isValid())
 		return;
 
-	while (m_qrealConnection->bytesAvailable() > 0)
+	while (c_Connection->bytesAvailable() > 0)
 	{
 		char data[100];
-		m_qrealConnection->readLine(data, 100);
+		c_Connection->readLine(data, 100);
 		QString command(data);
 		QStringList cmd = command.split(" ", QString::SkipEmptyParts);
 
 		QString commandName = cmd.at(0).trimmed();
 
-		if (m_sides.contains(commandName)) 
+		if (c_sides.contains(commandName)) 
 		{
-			m_sides[commandName]->setPower(cmd.at(1).toInt());
+			c_sides[commandName]->setPower(cmd.at(1).toInt());
 		}
 		//what the fuck?
 		// else if (commandName == "sound" || commandName == "beep") {
@@ -156,6 +156,6 @@ void CarCtrl::onQRealNetworkRead()
 		else {
 			qDebug() << "Unknown command: " + cmd.at(0);
 		}
-		qDebug() << "QReal request " << command;
+		qDebug() << "Request " << command;
 	}
 }

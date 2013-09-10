@@ -31,21 +31,21 @@ static const uint qt_meta_data_CarCtrl[] = {
 
  // slots: signature, parameters, type, tag, flags
       11,    9,    8,    8, 0x0a,
-      37,    8,    8,    8, 0x0a,
-      53,    8,    8,    8, 0x09,
-      73,    8,    8,    8, 0x09,
-      95,    8,    8,    8, 0x09,
-     116,    8,    8,    8, 0x09,
-     128,    8,    8,    8, 0x09,
+      32,    8,    8,    8, 0x0a,
+      48,    8,    8,    8, 0x09,
+      61,    8,    8,    8, 0x09,
+      76,    8,    8,    8, 0x09,
+      90,    8,    8,    8, 0x09,
+     102,    8,    8,    8, 0x09,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_CarCtrl[] = {
-    "CarCtrl\0\0a\0qrealResponce(QByteArray)\0"
-    "emergencyStop()\0onQRealConnection()\0"
-    "onQRealDisconnected()\0onQRealNetworkRead()\0"
-    "initSides()\0initSettings()\0"
+    "CarCtrl\0\0a\0Responce(QByteArray)\0"
+    "emergencyStop()\0Connection()\0"
+    "Disconnected()\0NetworkRead()\0initSides()\0"
+    "initSettings()\0"
 };
 
 void CarCtrl::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -54,11 +54,11 @@ void CarCtrl::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         Q_ASSERT(staticMetaObject.cast(_o));
         CarCtrl *_t = static_cast<CarCtrl *>(_o);
         switch (_id) {
-        case 0: _t->qrealResponce((*reinterpret_cast< const QByteArray(*)>(_a[1]))); break;
+        case 0: _t->Responce((*reinterpret_cast< const QByteArray(*)>(_a[1]))); break;
         case 1: _t->emergencyStop(); break;
-        case 2: _t->onQRealConnection(); break;
-        case 3: _t->onQRealDisconnected(); break;
-        case 4: _t->onQRealNetworkRead(); break;
+        case 2: _t->Connection(); break;
+        case 3: _t->Disconnected(); break;
+        case 4: _t->NetworkRead(); break;
         case 5: _t->initSides(); break;
         case 6: _t->initSettings(); break;
         default: ;

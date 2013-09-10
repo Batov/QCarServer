@@ -19,16 +19,16 @@ class CarCtrl : public QObject
 	Q_OBJECT
 public:
 	CarCtrl();
-	QSettings* getSettings() { return m_settings; } 
+	QSettings* getSettings() { return c_settings; } 
 
 public slots:
-	void qrealResponce(const QByteArray& a);
+	void Responce(const QByteArray& a);
 	void emergencyStop();
 
 protected slots:
-	void onQRealConnection();
-	void onQRealDisconnected();
-	void onQRealNetworkRead();
+	void Connection();
+	void Disconnected();
+	void NetworkRead();
 	void initSides();
 	void initSettings();
 
@@ -36,12 +36,12 @@ signals:
 
 protected:
 	//void timerEvent(QTimerEvent *event);
-	QMap<QString, Side*> m_sides;
+	QMap<QString, Side*> c_sides;
 
-	QSettings* m_settings;
-	QSettings* m_defaultSettings;
+	QSettings* c_settings;
+	QSettings* c_defaultSettings;
 
-	QTcpServer  m_qrealServer;
-	QTcpSocket* m_qrealConnection;
-	int m_timerId;
+	QTcpServer  c_Server;
+	QTcpSocket* c_Connection;
+	int c_timerId;
 };
