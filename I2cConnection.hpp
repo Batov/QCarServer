@@ -9,15 +9,15 @@ class I2cConnection : public QObject
 public:
 	I2cConnection(QString DevPath, int DevId);
 
-	void OpenConnection();
-	void SendData();
-	void CloseConnection();
+	int OpenConnection();
+	int SendData(char adress, int data);
+	int CloseConnection();
 
 signals:
-	void toLog(QString msg);
+	int toLog(QString msg);
 
 protected:
-	char i_DevFd;
+	char i_BusFd;
 	int i_DevId;
 	QString i_DevPath;
 };

@@ -8,15 +8,22 @@ s_power(0)
 	setPower(0);
 }
 
-void Side::setPower(int _power)
+int Side::setPower(int _power)
 {
+	s_motor_for_central_wheel->setPower(_power);
+	s_motor_for_edge_wheels->setPower(_power);
+	return 0;
 }
 
-void Side::setPeriod(int _period)
+int Side::setPeriod(int _period)
 {
+	s_motor_for_central_wheel->setPeriod(_period);
+	s_motor_for_edge_wheels->setPeriod(_period);
+	return 0;
 }
 
-void Side::emergencyStop()
+int Side::emergencyStop()
 {
 	setPower(0);
+	return 0;
 }

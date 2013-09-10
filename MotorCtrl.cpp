@@ -9,15 +9,44 @@ m_i2cCon(i2cCon)
 	setPower(0);
 }
 
-void Motor::setPower(int _power)
+int Motor::setPower(int _power)
 {
+	m_i2cCon->SendData(getPowerRegister(m_jack,_power);
+	return 0;
 }
 
-void Motor::setPeriod(int _period)
+int Motor::setPeriod(int _period)
 {
+	m_i2cCon->SendData(getPeriodRegister(m_jack,_period);
+	return 0;
 }
 
-void Motor::emergencyStop()
+int Motor::emergencyStop()
 {
 	setPower(0);
+	return 0;
+}
+
+char Motor::getPowerRegister(char jack)
+{
+	switch (jack)
+	{
+		case 1: return 0x14;
+		case 2: return 0x15;
+		case 3: return 0x16;
+		case 4: return 0x17;
+	}
+	return 0;
+}
+
+char Motor::getPeriodRegister(char jack)
+{
+	switch (jack)
+	{
+		case 1: return 0x10;
+		case 2: return 0x11;
+		case 3: return 0x12;
+		case 4: return 0x13;
+	}
+	return 0;
 }
