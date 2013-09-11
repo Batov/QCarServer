@@ -7,7 +7,6 @@
 #include <linux/input.h>
 
 #include "CarCtrl.hpp"
-#include "I2cConnection.hpp"
 
 CarCtrl::CarCtrl() :
 	c_Server(),
@@ -20,6 +19,13 @@ CarCtrl::CarCtrl() :
 	c_Connection = new QTcpSocket();
 	c_Server.listen(QHostAddress::Any, c_settings->value("ConnectionPort").toInt());
 	connect(&c_Server, SIGNAL(newConnection()), this, SLOT(Connection()));
+}
+
+CarCtrl::~CarCtrl()
+{
+	this.emergencyStop();	
+	Connection->Disconnected();
+	c_i2cCon->CloseConnection();
 }
 
 void CarCtrl::initSettings()
@@ -72,6 +78,7 @@ void CarCtrl::initSides()
 		QString DevPath  = c_settings->value("DevPath").toString();
 		int DevId = c_settings->value("DevId").toInt();
 		I2cConnection* i2cCon = new I2cConnection(DevPath,DevId);
+		c_i2cCon = i2cCon;
 
 	for (int i = 0; i < sidesKeys.size(); ++i) 
 	{
@@ -112,7 +119,8 @@ void CarCtrl::Connection()
 
 void CarCtrl::Disconnected()
 {
-	qDebug() << "Disconnected";
+	this.emergencyStop();
+	qDebug() << "Disconnected, STOP MOTORS!";
 	c_Connection->disconnectFromHost();
 }
 
@@ -139,23 +147,8 @@ void CarCtrl::NetworkRead()
 		{
 			c_sides[commandName]->setPower(cmd.at(1).toInt());
 		}
-		//what the fuck?
-		// else if (commandName == "sound" || commandName == "beep") {
-		// 	m_autopilot = !m_autopilot;
-		// 	qDebug() << "Unknown command: ";
-		// 	if (m_autopilot){
-		// 		m_timerId = startTimer(20);
-
-		// 	}
-		// 	else 
-		// 	{
-		// 		killTimer(m_timerId);
-		// 		m_timerId =-1;
-		// 		this->emergencyStop();
-		// 	}
-		// 	//	playSound(m_settings->value("SoundFile").toString());
-		//}
-		else {
+		else 
+		{
 			qDebug() << "Unknown command: " + cmd.at(0);
 		}
 		qDebug() << "Request " << command;

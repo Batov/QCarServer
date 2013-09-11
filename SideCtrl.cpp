@@ -15,13 +15,6 @@ int Side::setPower(int _power)
 	return 0;
 }
 
-int Side::setPeriod(int _period)
-{
-	s_motor_for_central_wheel->setPeriod(_period);
-	s_motor_for_edge_wheels->setPeriod(_period);
-	return 0;
-}
-
 int Side::emergencyStop()
 {
 	setPower(0);

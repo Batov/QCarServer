@@ -12,8 +12,7 @@ class Side : public QObject
 public:
 	Side(char central,char edge, int period, I2cConnection* i2cCon);
 
-	int setPower(int _power); 
-	int setPeriod(int _period); 
+	int setPower(int _power);
 
 public slots:
 	int emergencyStop();

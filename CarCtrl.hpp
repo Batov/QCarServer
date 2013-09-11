@@ -6,6 +6,7 @@
 #include <QVector3D>
 
 #include "SideCtrl.hpp"
+#include "I2cConnection.hpp"
 
 
 #if QT_VERSION >= 0x050000  // wtf?
@@ -19,6 +20,7 @@ class CarCtrl : public QObject
 	Q_OBJECT
 public:
 	CarCtrl();
+	~CarCtrl();
 	QSettings* getSettings() { return c_settings; } 
 
 public slots:
@@ -44,4 +46,5 @@ protected:
 	QTcpServer  c_Server;
 	QTcpSocket* c_Connection;
 	int c_timerId;
+	I2cConnection* c_i2cCon;
 };
