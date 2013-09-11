@@ -27,4 +27,5 @@ protected:
 	unsigned char m_jack; 
 	int m_power;
 	I2cConnection* m_i2cCon;
+	const char min_Period = 200;
 };

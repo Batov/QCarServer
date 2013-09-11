@@ -69,6 +69,10 @@ void CarCtrl::initSides()
 	QStringList sidesKeys = c_settings->allKeys();
 	c_settings->endGroup();
 
+		QString DevPath  = c_settings->value("DevPath").toString();
+		int DevId = c_settings->value("DevId").toInt();
+		I2cConnection* i2cCon = new I2cConnection(DevPath,DevId);
+
 	for (int i = 0; i < sidesKeys.size(); ++i) 
 	{
 		QString name = sidesKeys[i];
@@ -79,10 +83,8 @@ void CarCtrl::initSides()
 		int Period = c_settings->value("Period").toInt();
 		c_settings->endGroup();
 
-		QString DevPath  = c_settings->value("DevPath").toString();
-		int DevId = c_settings->value("DevId").toInt();
-		I2cConnection* i2cCon = new I2cConnection(DevPath,DevId);
 		Side* side = new Side(Center,Edge,Period,i2cCon);
+		c_sides[name] = side;
 		
 	}
 

@@ -48,8 +48,9 @@ int I2cConnection::CloseConnection()
   	return 0;
 }
 
-int I2cConnection::SendData(char adress, int data)
+int I2cConnection::SendData(char* data, char size)
 {
+	//TODO: check it
   int res;
   if (ioctl(i_BusFd, I2C_SLAVE, i_DevId) != 0)
   {
@@ -57,10 +58,11 @@ int I2cConnection::SendData(char adress, int data)
     fprintf(stderr, "ioctl(%d, I2C_SLAVE, %d) failed: %d\n", i_BusFd, i_DevId, res);
     return res;
   }
-
-   unsigned char cmd[2];
-   cmd[0] = adress&0xff;
-   cmd[1] = data&0xff; //TODO fix it!
+   unsigned char cmd[size];
+  for (int i = 0; i < size; ++i)
+  {
+  	cmd[i] = data[i++];
+  }
 
   if ((res = write(i_BusFd, &cmd, sizeof(cmd)) != sizeof(cmd)))
   {

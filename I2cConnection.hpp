@@ -10,7 +10,7 @@ public:
 	I2cConnection(QString DevPath, int DevId);
 
 	int OpenConnection();
-	int SendData(char adress, int data);
+	int SendData(char* data, char size);
 	int CloseConnection();
 
 signals:
