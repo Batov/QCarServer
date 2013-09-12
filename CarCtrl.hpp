@@ -33,7 +33,7 @@ protected slots:
 	void NetworkRead();
 	void initSides();
 	void initSettings();
-
+ 
 signals:
 
 protected:

@@ -14,6 +14,7 @@ CarCtrl::CarCtrl() :
 	c_timerId(-1)
 {
 	initSettings();
+	printf("ConnectionPort = %d\n", c_settings->value("ConnectionPort").toInt());
 	initSides();
 
 	c_Connection = new QTcpSocket();
@@ -23,8 +24,8 @@ CarCtrl::CarCtrl() :
 
 CarCtrl::~CarCtrl()
 {
-	this.emergencyStop();	
-	Connection->Disconnected();
+	this->emergencyStop();	
+	Disconnected(); 
 	c_i2cCon->CloseConnection();
 }
 
@@ -39,14 +40,14 @@ void CarCtrl::initSettings()
 	c_defaultSettings->endGroup();
 
 	c_defaultSettings->beginGroup("left"); 
-	c_defaultSettings->setValue("CentralWheel", 1 );
-	c_defaultSettings->setValue("EdgesWheels", 2);
+	c_defaultSettings->setValue("CentralWheel", 3 );
+	c_defaultSettings->setValue("EdgesWheels", 1);
 	c_defaultSettings->setValue("Period", 20000 );
 	c_defaultSettings->endGroup();
 
 	c_defaultSettings->beginGroup("right");
-	c_defaultSettings->setValue("CentralWheel", 3 );
-	c_defaultSettings->setValue("EdgesWheels", 4);
+	c_defaultSettings->setValue("CentralWheel", 2 );
+	c_defaultSettings->setValue("EdgesWheels", 3);
 	c_defaultSettings->setValue("Period", 20000 );
 	c_defaultSettings->endGroup();
 
@@ -83,16 +84,13 @@ void CarCtrl::initSides()
 	for (int i = 0; i < sidesKeys.size(); ++i) 
 	{
 		QString name = sidesKeys[i];
-
 		c_settings->beginGroup(name);
-		char Center = c_settings->value("CentralWheel").toChar().toAscii();
-		char Edge = c_settings->value("EdgesWheels").toChar().toAscii();
+		char Center = (char) (c_settings->value("CentralWheel").toInt());
+		char Edge = (char) c_settings->value("EdgesWheels").toInt();
 		int Period = c_settings->value("Period").toInt();
-		c_settings->endGroup();
-
 		Side* side = new Side(Center,Edge,Period,i2cCon);
 		c_sides[name] = side;
-		
+		c_settings->endGroup();
 	}
 
 }
@@ -119,7 +117,7 @@ void CarCtrl::Connection()
 
 void CarCtrl::Disconnected()
 {
-	this.emergencyStop();
+	this->emergencyStop();
 	qDebug() << "Disconnected, STOP MOTORS!";
 	c_Connection->disconnectFromHost();
 }
@@ -151,6 +149,6 @@ void CarCtrl::NetworkRead()
 		{
 			qDebug() << "Unknown command: " + cmd.at(0);
 		}
-		qDebug() << "Request " << command;
+		qDebug() << "Request" << command;
 	}
 }

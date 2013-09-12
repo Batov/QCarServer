@@ -28,7 +28,7 @@ int I2cConnection::OpenConnection()
 	if (i_BusFd< 0)
   		{
     		res = errno;
-    		fprintf(stderr, "open(%s) failed: %d\n", i_DevPath.toAscii().data(), res);
+    		fprintf(stdout, "open(%s) failed: %d\n", i_DevPath.toAscii().data(), res);
     		i_BusFd = -1;
     		return res;
   		}
@@ -41,7 +41,7 @@ int I2cConnection::CloseConnection()
 	if (close(i_BusFd) != 0)
   		{
     		res = errno;
-    		fprintf(stderr, "close() failed: %d\n", res);
+    		fprintf(stdout, "close() failed: %d\n", res);
     		return res;
   		}
   	i_BusFd = -1;
@@ -50,18 +50,18 @@ int I2cConnection::CloseConnection()
 
 int I2cConnection::SendData(char* data, char size)
 {
-	//TODO: check it
+	 //TODO: check it
   int res;
   if (ioctl(i_BusFd, I2C_SLAVE, i_DevId) != 0)
   {
     res = errno;
-    fprintf(stderr, "ioctl(%d, I2C_SLAVE, %d) failed: %d\n", i_BusFd, i_DevId, res);
+    fprintf(stdout, "ioctl(%d, I2C_SLAVE, %d) failed: %d\n", i_BusFd, i_DevId, res);
     return res;
   }
    unsigned char cmd[size];
   for (int i = 0; i < size; ++i)
   {
-  	cmd[i] = data[i++];
+  	cmd[i] = data[i];
   }
 
   if ((res = write(i_BusFd, &cmd, sizeof(cmd)) != sizeof(cmd)))
@@ -70,7 +70,7 @@ int I2cConnection::SendData(char* data, char size)
       res = E2BIG;
     else
       res = errno;
-    fprintf(stderr, "write(%d) failed: %d\n", i_BusFd, res);
+    fprintf(stdout, "write(%d) failed: %d\n", i_BusFd, res);
     return res;
   }
 

@@ -17,16 +17,16 @@ contains($$[QT_VERSION_MAJOR],5) {
 TARGET =        car-ctrl
 SOURCES +=      \
     Main.cpp \
-    SideCtrl.cpp \
+    i2cConnection.cpp \
     CarCtrl.cpp \
-    MotorCtrl.cpp \
-    I2cConnection.cpp
+    SideCtrl.cpp \	
+    MotorCtrl.cpp
 
 HEADERS +=      \
-    SideCtrl.hpp \
+    i2cConnection.hpp \
     CarCtrl.hpp \
-    MotorCtrl.hpp \
-    I2cConnection.hpp	
+    SideCtrl.hpp \
+    MotorCtrl.hpp
 
 FORMS +=        
 
