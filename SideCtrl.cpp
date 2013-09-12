@@ -13,9 +13,3 @@ int Side::setPower(int _power)
 	s_motor_for_edge_wheels->setPower(_power);
 	return 0;
 } 
-
-int Side::emergencyStop()
-{
-	setPower(0);
-	return 0;
-}

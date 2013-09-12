@@ -3,7 +3,6 @@
 #include <QTcpServer>
 #include <QSocketNotifier>
 #include <QSettings>
-#include <QVector3D>
 
 #include "SideCtrl.hpp"
 #include "I2cConnection.hpp"
@@ -21,6 +20,7 @@ class CarCtrl : public QObject
 public:
 	CarCtrl();
 	~CarCtrl();
+
 	QSettings* getSettings() { return c_settings; } 
 
 public slots:
@@ -40,6 +40,7 @@ signals:
 
 protected:
 	char c_StopFlag;
+
 	QMap<QString, Side*> c_sides;
 
 	QSettings* c_settings;

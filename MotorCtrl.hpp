@@ -1,7 +1,5 @@
 #pragma once
 
-//#include <QFile>
-//#include <QSettings>
 #include "I2cConnection.hpp"
 
 
@@ -18,7 +16,6 @@ public:
 
 
 public slots:
-	int emergencyStop();
 
 signals:
 	int toLog(QString msg);

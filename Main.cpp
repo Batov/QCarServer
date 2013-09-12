@@ -1,6 +1,5 @@
 #include <QStyleFactory>
 #include <QDebug>
-#include <QStringList>
 #include <QWSServer>
 
 #include "CarCtrl.hpp"

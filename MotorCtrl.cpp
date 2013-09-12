@@ -31,14 +31,7 @@ int Motor::setPeriod(int _period)
 	data[1] = (_period)&0xff;
 	data[2] = (_period >> 8)&0xff;
 	printf("Set Period : Motor jack = %d Period=%d \n",m_jack,_period);
-	//TODO: check it
 	m_i2cCon->SendData(data,sizeof(data));
-	return 0;
-}
-
-int Motor::emergencyStop()
-{
-	setPower(0);
 	return 0;
 }
 

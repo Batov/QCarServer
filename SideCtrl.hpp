@@ -1,8 +1,5 @@
 #pragma once
 
-//#include <QFile>
-//#include <QSettings>
-
 #include "MotorCtrl.hpp"
 #include "I2cConnection.hpp"
 
@@ -15,13 +12,13 @@ public:
 	int setPower(int _power);
 
 public slots:
-	int emergencyStop();
 
 signals:
 	int toLog(QString msg);
 
 protected:
 	int s_power;
+
 	Motor* s_motor_for_central_wheel;
 	Motor* s_motor_for_edge_wheels;
 };

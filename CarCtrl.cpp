@@ -1,8 +1,6 @@
 #include <QtCore/QStringList>
 #include <QtNetwork/QTcpSocket>
 
-#include <cmath>
-#include <fcntl.h>
 #include <unistd.h>
 #include <linux/input.h>
 
@@ -24,7 +22,7 @@ CarCtrl::CarCtrl() :
 
 CarCtrl::~CarCtrl()
 {
-	this->emergencyStop();	
+	emergencyStop();	
 	Disconnected(); 
 	c_i2cCon->CloseConnection();
 }
@@ -52,16 +50,17 @@ void CarCtrl::initSettings()
 	c_defaultSettings->endGroup();
 
 	c_defaultSettings->setValue("DevPath", "/dev/i2c-2");
-	c_defaultSettings->setValue("DevId", 0x48);
+	c_defaultSettings->setValue("DevId", 72); //0x48
 
 	c_defaultSettings->setValue("ConnectionPort", 4444);
 
 	c_settings = new QSettings(QApplication::applicationDirPath() + "/config.ini", QSettings::IniFormat);
 
-	if (c_settings->allKeys().count() == 0) {
-		// use default
+	if (c_settings->allKeys().count() == 0) 
+	{
 		QStringList keys = c_defaultSettings->allKeys();
-		for (unsigned int i = 0; i < keys.count(); ++i) {
+		for (unsigned int i = 0; i < keys.count(); ++i) 
+		{
 			c_settings->setValue(keys.at(i), c_defaultSettings->value(keys.at(i)));
 		}
 	}
@@ -76,10 +75,10 @@ void CarCtrl::initSides()
 	QStringList sidesKeys = c_settings->allKeys();
 	c_settings->endGroup();
 
-		QString DevPath  = c_settings->value("DevPath").toString();
-		int DevId = c_settings->value("DevId").toInt();
-		I2cConnection* i2cCon = new I2cConnection(DevPath,DevId);
-		c_i2cCon = i2cCon;
+	QString DevPath  = c_settings->value("DevPath").toString();
+	int DevId = c_settings->value("DevId").toInt();
+	I2cConnection* i2cCon = new I2cConnection(DevPath,DevId); //one i2c connection for everybody
+	c_i2cCon = i2cCon;
 
 	for (int i = 0; i < sidesKeys.size(); ++i) 
 	{
@@ -116,8 +115,7 @@ void CarCtrl::Stop()
 void CarCtrl::Connection()
 {
 	Stop();
-	if (c_Connection->isValid())
-		qDebug() << "Replacing existing connection";
+	if (c_Connection->isValid()) qDebug() << "Replacing existing connection";
 	c_Connection = c_Server.nextPendingConnection();
 	qDebug() << "Accepted new connection";
 	c_Connection->setSocketOption(QAbstractSocket::LowDelayOption, 1);
@@ -139,8 +137,7 @@ void CarCtrl::Responce(const QByteArray& a)
 
 void CarCtrl::NetworkRead()
 {
-	if (!c_Connection->isValid())
-		return;
+	if (!c_Connection->isValid()) return;
 
 	while (c_Connection->bytesAvailable() > 0)
 	{
@@ -148,14 +145,14 @@ void CarCtrl::NetworkRead()
 		c_Connection->readLine(data, 100);
 		QString command(data);
 		QStringList cmd = command.split(" ", QString::SkipEmptyParts);
-
 		QString commandName = cmd.at(0).trimmed();
 		qDebug() << commandName;
 		if (c_sides.contains(commandName)) 
 		{
 			if (c_StopFlag == 0) 
 				c_sides[commandName]->setPower(cmd.at(1).toInt());
-					else qDebug() << "Emergency Stop Status";
+			else 
+				qDebug() << "Emergency Stop Status";
 		}
 		else if (commandName == "Emergency Stop") emergencyStop();
 		else if (commandName == "Resume") resumeMoving();

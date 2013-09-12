@@ -2,7 +2,6 @@
 
 #include <QObject>
 
-
 class I2cConnection : public QObject
 {
 	Q_OBJECT
