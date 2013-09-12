@@ -11,7 +11,7 @@
 CarCtrl::CarCtrl() :
 	c_Server(),
 	c_sides(),
-	c_timerId(-1)
+	c_StopFlag(0)
 {
 	initSettings();
 	printf("ConnectionPort = %d\n", c_settings->value("ConnectionPort").toInt());
@@ -95,7 +95,16 @@ void CarCtrl::initSides()
 
 }
 
+void CarCtrl::resumeMoving()
+{
+	c_StopFlag = 0;
+}
 void CarCtrl::emergencyStop()
+{
+	c_StopFlag = 1;
+	Stop();
+}
+void CarCtrl::Stop()
 {
 	Side* side;
 	foreach (side, c_sides) 
@@ -106,6 +115,7 @@ void CarCtrl::emergencyStop()
 
 void CarCtrl::Connection()
 {
+	Stop();
 	if (c_Connection->isValid())
 		qDebug() << "Replacing existing connection";
 	c_Connection = c_Server.nextPendingConnection();
@@ -117,7 +127,7 @@ void CarCtrl::Connection()
 
 void CarCtrl::Disconnected()
 {
-	this->emergencyStop();
+	Stop();
 	qDebug() << "Disconnected, STOP MOTORS!";
 	c_Connection->disconnectFromHost();
 }
@@ -140,15 +150,20 @@ void CarCtrl::NetworkRead()
 		QStringList cmd = command.split(" ", QString::SkipEmptyParts);
 
 		QString commandName = cmd.at(0).trimmed();
-
+		qDebug() << commandName;
 		if (c_sides.contains(commandName)) 
 		{
-			c_sides[commandName]->setPower(cmd.at(1).toInt());
+			if (c_StopFlag == 0) 
+				c_sides[commandName]->setPower(cmd.at(1).toInt());
+					else qDebug() << "Emergency Stop Status";
 		}
-		else 
+		else if (commandName == "Emergency Stop") emergencyStop();
+		else if (commandName == "Resume") resumeMoving();
+		else if (commandName == "Stop") Stop();
+		else
 		{
 			qDebug() << "Unknown command: " + cmd.at(0);
 		}
-		qDebug() << "Request" << command;
+		//qDebug() << "Request" << command;
 	}
 }

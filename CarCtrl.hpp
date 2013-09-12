@@ -26,6 +26,8 @@ public:
 public slots:
 	void Responce(const QByteArray& a);
 	void emergencyStop();
+	void resumeMoving();
+	void Stop();
 
 protected slots:
 	void Connection();
@@ -33,11 +35,11 @@ protected slots:
 	void NetworkRead();
 	void initSides();
 	void initSettings();
- 
+
 signals:
 
 protected:
-	//void timerEvent(QTimerEvent *event);
+	char c_StopFlag;
 	QMap<QString, Side*> c_sides;
 
 	QSettings* c_settings;
@@ -45,6 +47,6 @@ protected:
 
 	QTcpServer  c_Server;
 	QTcpSocket* c_Connection;
-	int c_timerId;
+
 	I2cConnection* c_i2cCon;
 };

@@ -17,7 +17,7 @@ int Motor::setPower(int _power)
 	char data[2];
 	data[0] = getPowerRegister(m_jack);
 	data[1] = (_power)&0xff;
-	printf("Set Power  : Motor jack = %d Power=%x \n",m_jack,data[1]);
+	printf("Set Power  : Motor jack = %d Power=%d% \n",m_jack,_power);
 	m_i2cCon->SendData(data,sizeof(data));
 	return 0;
 }
@@ -30,7 +30,7 @@ int Motor::setPeriod(int _period)
 	data[0] = getPeriodRegister(m_jack);
 	data[1] = (_period)&0xff;
 	data[2] = (_period >> 8)&0xff;
-	printf("Set Period : Motor jack = %d Period=%x%x \n",m_jack,data[2],data[1]);
+	printf("Set Period : Motor jack = %d Period=%d \n",m_jack,_period);
 	//TODO: check it
 	m_i2cCon->SendData(data,sizeof(data));
 	return 0;
