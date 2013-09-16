@@ -1,8 +1,10 @@
 #include <QtCore/QStringList>
 #include <QtNetwork/QTcpSocket>
+#include <QtGui/QKeyEvent>
 
 #include <unistd.h>
 #include <linux/input.h>
+
 
 #include "CarCtrl.hpp"
 
@@ -22,7 +24,7 @@ CarCtrl::CarCtrl() :
 
 CarCtrl::~CarCtrl()
 {
-	emergencyStop();	
+	EmergencyStop();	
 	Disconnected(); 
 	c_i2cCon->CloseConnection();
 }
@@ -94,11 +96,11 @@ void CarCtrl::initSides()
 
 }
 
-void CarCtrl::resumeMoving()
+void CarCtrl::ResumeMoving()
 {
 	c_StopFlag = 0;
 }
-void CarCtrl::emergencyStop()
+void CarCtrl::EmergencyStop()
 {
 	c_StopFlag = 1;
 	Stop();
@@ -154,8 +156,8 @@ void CarCtrl::NetworkRead()
 			else 
 				qDebug() << "Emergency Stop Status";
 		}
-		else if (commandName == "Emergency Stop") emergencyStop();
-		else if (commandName == "Resume") resumeMoving();
+		else if (commandName == "Emergency Stop") EmergencyStop();
+		else if (commandName == "Resume") ResumeMoving();
 		else if (commandName == "Stop") Stop();
 		else
 		{
@@ -163,4 +165,11 @@ void CarCtrl::NetworkRead()
 		}
 		//qDebug() << "Request" << command;
 	}
+}
+
+void CarCtrl::keyPressEvent(QKeyEvent* event) 
+{
+    printf("\nkey event from board: %d", event->key());
+    qDebug() << "Pressed";
+    if (c_StopFlag) EmergencyStop(); else ResumeMoving(); 
 }

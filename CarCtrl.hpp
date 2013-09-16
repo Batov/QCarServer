@@ -3,6 +3,8 @@
 #include <QTcpServer>
 #include <QSocketNotifier>
 #include <QSettings>
+#include <QtGui/QKeyEvent>
+#include <QWidget>
 
 #include "SideCtrl.hpp"
 #include "I2cConnection.hpp"
@@ -14,7 +16,7 @@
 #include <QtGui/QApplication>
 #endif
 
-class CarCtrl : public QObject
+class CarCtrl : public QWidget
 {
 	Q_OBJECT
 public:
@@ -25,8 +27,8 @@ public:
 
 public slots:
 	void Responce(const QByteArray& a);
-	void emergencyStop();
-	void resumeMoving();
+	void EmergencyStop();
+	void ResumeMoving();
 	void Stop();
 
 protected slots:
@@ -39,6 +41,9 @@ protected slots:
 signals:
 
 protected:
+
+	//virtual
+	void  keyPressEvent(QKeyEvent *event);
 	char c_StopFlag;
 
 	QMap<QString, Side*> c_sides;
