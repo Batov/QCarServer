@@ -34,6 +34,7 @@ void CarCtrl::initSettings()
 	c_defaultSettings = new QSettings(this);
 
 	// default settings init
+
 	c_defaultSettings->beginGroup("SidesKeys");
 	c_defaultSettings->setValue("left", 0);
 	c_defaultSettings->setValue("right", 1);
@@ -146,30 +147,64 @@ void CarCtrl::NetworkRead()
 		char data[100];
 		c_Connection->readLine(data, 100);
 		QString command(data);
-		QStringList cmd = command.split(" ", QString::SkipEmptyParts);
-		QString commandName = cmd.at(0).trimmed();
-		qDebug() << commandName;
-		if (c_sides.contains(commandName)) 
-		{
-			if (c_StopFlag == 0) 
-				c_sides[commandName]->setPower(cmd.at(1).toInt());
-			else 
-				qDebug() << "Emergency Stop Status";
-		}
-		else if (commandName == "Emergency Stop") EmergencyStop();
-		else if (commandName == "Resume") ResumeMoving();
-		else if (commandName == "Stop") Stop();
-		else
-		{
-			qDebug() << "Unknown command: " + cmd.at(0);
-		}
-		//qDebug() << "Request" << command;
+		Run(command.split(" ", QString::SkipEmptyParts));
 	}
+		
 }
 
 void CarCtrl::keyPressEvent(QKeyEvent* event) 
 {
     printf("\nkey event from board: %d", event->key());
     qDebug() << "Pressed";
-    if (c_StopFlag) EmergencyStop(); else ResumeMoving(); 
+    if (c_StopFlag == 0) EmergencyStop(); else ResumeMoving(); 
+}
+
+
+void CarCtrl::Run(QStringList cmd)
+{
+	qDebug() << cmd;
+
+	QString commandName = cmd.at(0).trimmed();
+	if (commandName == "pad")
+	{
+		if (cmd.at(1).trimmed().toInt() == 1)
+		{
+			if (cmd.at(2).trimmed() == "up") 
+				Stop();
+			else 
+				{
+					int x = cmd.at(2).trimmed().toInt();
+					int y =	cmd.at(3).trimmed().toInt();
+					int right =  y - x;  //check and fix it
+					int left = y + x;
+					if (c_StopFlag == 0)
+					{
+						c_sides["left"]->setPower(left);
+						c_sides["right"]->setPower(right);
+					}
+				}
+		}
+	}
+	else if (commandName == "btn")
+			{ 
+				if (cmd.at(1).trimmed().toInt() == 1)
+					if (c_StopFlag == 1) ResumeMoving();
+					else EmergencyStop();
+			}
+	else if (commandName == "wheel")
+			{
+				int left = 80 + cmd.at(1).trimmed().toInt(); // check and fix it
+				int right = 80 - cmd.at(1).trimmed().toInt();
+				if (c_StopFlag == 0)
+					{
+						c_sides["left"]->setPower(left);
+						c_sides["right"]->setPower(right);
+					}
+			}
+	else
+		{
+			qDebug() << "Unknown command" ;
+		}
+		//qDebug() << "Request" << command;
+	
 }

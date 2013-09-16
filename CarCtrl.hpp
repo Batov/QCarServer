@@ -30,6 +30,7 @@ public slots:
 	void EmergencyStop();
 	void ResumeMoving();
 	void Stop();
+	void Run(QStringList);
 
 protected slots:
 	void Connection();
