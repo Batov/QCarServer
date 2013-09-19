@@ -5,9 +5,11 @@
 #include <QSettings>
 #include <QtGui/QKeyEvent>
 #include <QWidget>
+#include <QIODevice>
 
 #include "SideCtrl.hpp"
 #include "I2cConnection.hpp"
+#include "Sensors.hpp"
 
 
 #if QT_VERSION >= 0x050000  // wtf?
@@ -46,6 +48,8 @@ protected:
 	//virtual
 	void  keyPressEvent(QKeyEvent *event);
 	char c_StopFlag;
+
+	Sensors* c_Sen;
 
 	QMap<QString, Side*> c_sides;
 

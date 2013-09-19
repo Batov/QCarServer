@@ -1,10 +1,9 @@
 #include <QtCore/QStringList>
 #include <QtNetwork/QTcpSocket>
-#include <QtGui/QKeyEvent>
+#include <QtGui>
 
 #include <unistd.h>
 #include <linux/input.h>
-
 
 #include "CarCtrl.hpp"
 
@@ -82,6 +81,7 @@ void CarCtrl::initSides()
 	int DevId = c_settings->value("DevId").toInt();
 	I2cConnection* i2cCon = new I2cConnection(DevPath,DevId); //one i2c connection for everybody
 	c_i2cCon = i2cCon;
+	c_Sen = new Sensors(c_i2cCon);
 
 	for (int i = 0; i < sidesKeys.size(); ++i) 
 	{
@@ -154,7 +154,7 @@ void CarCtrl::NetworkRead()
 
 void CarCtrl::keyPressEvent(QKeyEvent* event) 
 {
-    printf("\nkey event from board: %d", event->key());
+//    printf("\nkey event from board: %d", event->key());
     qDebug() << "Pressed";
     if (c_StopFlag == 0) EmergencyStop(); else ResumeMoving(); 
 }
@@ -200,6 +200,14 @@ void CarCtrl::Run(QStringList cmd)
 						c_sides["left"]->setPower(left);
 						c_sides["right"]->setPower(right);
 					}
+			}
+	else if (commandName == "read")
+			{
+				qDebug() << c_Sen->getValue(cmd.at(1).trimmed().toInt());
+			}
+	else if (commandName == "close")
+			{
+				c_i2cCon->CloseConnection();
 			}
 	else
 		{

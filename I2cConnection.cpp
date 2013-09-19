@@ -43,7 +43,6 @@ int I2cConnection::CloseConnection()
 
 int I2cConnection::SendData(char* data, char size)
 {
-	 //TODO: check it
   int res;
   if (ioctl(i_BusFd, I2C_SLAVE, i_DevId) != 0)
   {
@@ -69,3 +68,26 @@ int I2cConnection::SendData(char* data, char size)
 
 return 0;
 }
+
+uint16_t I2cConnection::ReceiveData(uint8_t reg)
+{
+  int res;
+  if (ioctl(i_BusFd, I2C_SLAVE, i_DevId) != 0)
+  {
+    res = errno;
+    fprintf(stdout, "ioctl(%d, I2C_SLAVE, %d) failed: %d\n", i_BusFd, i_DevId, res);
+    return res;
+  }
+
+  uint8_t data[3];
+  data[0] = reg;
+
+  if (write(i_BusFd, data, 1) != 1) 
+    fprintf(stdout, "write register failed");
+  
+  if (read(i_BusFd, data, 2) != 2) 
+    fprintf(stdout, "read failed");
+  
+  return data[0] | (data[1] << 8);
+}
+

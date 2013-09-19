@@ -10,6 +10,7 @@ public:
 
 	int OpenConnection();
 	int SendData(char* data, char size);
+	uint16_t ReceiveData(uint8_t reg);
 	int CloseConnection();
 
 signals:

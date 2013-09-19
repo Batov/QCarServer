@@ -8,25 +8,29 @@ debug:CONFIG += console
 
 CONFIG -=       warn_off
 
+QT +=           core
+
 QT +=           network
 
 contains($$[QT_VERSION_MAJOR],5) {
     QT += widgets
 }
 
-TARGET =        car-ctrl
+TARGET =        QCarServer
 SOURCES +=      \
     Main.cpp \
     i2cConnection.cpp \
     CarCtrl.cpp \
     SideCtrl.cpp \	
-    MotorCtrl.cpp
+    MotorCtrl.cpp \
+    Sensors.cpp
 
 HEADERS +=      \
     i2cConnection.hpp \
     CarCtrl.hpp \
     SideCtrl.hpp \
-    MotorCtrl.hpp
+    MotorCtrl.hpp \ 
+    Sensors.hpp
 
 FORMS +=        
 
