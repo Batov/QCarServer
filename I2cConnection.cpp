@@ -71,22 +71,28 @@ return 0;
 
 uint16_t I2cConnection::ReceiveData(uint8_t reg)
 {
-  int res;
-  if (ioctl(i_BusFd, I2C_SLAVE, i_DevId) != 0)
-  {
-    res = errno;
-    fprintf(stdout, "ioctl(%d, I2C_SLAVE, %d) failed: %d\n", i_BusFd, i_DevId, res);
-    return res;
-  }
+  // int res;
+  // if (ioctl(i_BusFd, I2C_SLAVE, i_DevId) != 0)
+  // {
+  //   res = errno;
+  //   fprintf(stdout, "ioctl(%d, I2C_SLAVE, %d) failed: %d\n", i_BusFd, i_DevId, res);
+  //   return res;
+  // }
 
   uint8_t data[3];
-  data[0] = reg;
+  data[0]= reg;
 
-  if (write(i_BusFd, data, 1) != 1) 
-    fprintf(stdout, "write register failed");
+  if (write(i_BusFd, data, 1) != 1) // may be use &
+  { 
+    fprintf(stdout, "write register failed \n");
+    return 1;
+  }
   
   if (read(i_BusFd, data, 2) != 2) 
-    fprintf(stdout, "read failed");
+  {
+    fprintf(stdout, "read failed \n");
+    return 1;
+  }
   
   return data[0] | (data[1] << 8);
 }

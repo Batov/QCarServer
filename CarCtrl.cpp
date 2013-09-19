@@ -155,7 +155,7 @@ void CarCtrl::NetworkRead()
 void CarCtrl::keyPressEvent(QKeyEvent* event) 
 {
 //    printf("\nkey event from board: %d", event->key());
-    qDebug() << "Pressed";
+    qDebug() << "Key Pressed";
     if (c_StopFlag == 0) EmergencyStop(); else ResumeMoving(); 
 }
 
