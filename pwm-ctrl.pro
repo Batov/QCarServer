@@ -19,13 +19,11 @@ SOURCES +=      \
     Main.cpp \
     I2cConnection.cpp \
     CarCtrl.cpp \
-    SideCtrl.cpp \	
     MotorCtrl.cpp
 
 HEADERS +=      \
     I2cConnection.hpp \
     CarCtrl.hpp \
-    SideCtrl.hpp \
     MotorCtrl.hpp
 
 FORMS +=        

@@ -6,7 +6,7 @@
 #include <QtGui/QKeyEvent>
 #include <QWidget>
 
-#include "SideCtrl.hpp"
+#include "MotorCtrl.hpp"
 #include "I2cConnection.hpp"
 
 
@@ -36,7 +36,7 @@ protected slots:
 	void Connection();
 	void Disconnected();
 	void NetworkRead();
-	void initSides();
+	void initMotors();
 	void initSettings();
 
 signals:
@@ -47,7 +47,7 @@ protected:
 	void  keyPressEvent(QKeyEvent *event);
 	char c_StopFlag;
 
-	QMap<QString, Side*> c_sides;
+	QMap<QString, Motor*> c_motors;
 
 	QSettings* c_settings;
 	QSettings* c_defaultSettings;

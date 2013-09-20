@@ -10,12 +10,12 @@
 
 CarCtrl::CarCtrl() :
 	c_Server(),
-	c_sides(),
+	c_motors(),
 	c_StopFlag(0)
 {
 	initSettings();
 	printf("ConnectionPort = %d\n", c_settings->value("ConnectionPort").toInt());
-	initSides();
+	initMotors();
 
 	c_Connection = new QTcpSocket();
 	c_Server.listen(QHostAddress::Any, c_settings->value("ConnectionPort").toInt());
@@ -35,22 +35,14 @@ void CarCtrl::initSettings()
 
 	// default settings init
 
-	c_defaultSettings->beginGroup("SidesKeys");
-	c_defaultSettings->setValue("left", 0);
-	c_defaultSettings->setValue("right", 1);
+	c_defaultSettings->beginGroup("MotorsKeys");
+	c_defaultSettings->setValue("First", 1);
+	c_defaultSettings->setValue("Second", 2);
+	c_defaultSettings->setValue("Third", 3);
+	c_defaultSettings->setValue("Fourth", 4);
 	c_defaultSettings->endGroup();
 
-	c_defaultSettings->beginGroup("left"); 
-	c_defaultSettings->setValue("CentralWheel", 3 );
-	c_defaultSettings->setValue("EdgesWheels", 1);
-	c_defaultSettings->setValue("Period", 20000 );
-	c_defaultSettings->endGroup();
-
-	c_defaultSettings->beginGroup("right");
-	c_defaultSettings->setValue("CentralWheel", 2 );
-	c_defaultSettings->setValue("EdgesWheels", 3);
-	c_defaultSettings->setValue("Period", 20000 );
-	c_defaultSettings->endGroup();
+	c_defaultSettings->setValue("Period", 20000);
 
 	c_defaultSettings->setValue("DevPath", "/dev/i2c-2");
 	c_defaultSettings->setValue("DevId", 72); //0x48
@@ -72,10 +64,10 @@ void CarCtrl::initSettings()
 	c_settings->sync();
 }
 
-void CarCtrl::initSides()
+void CarCtrl::initMotors()
 {
-	c_settings->beginGroup("SidesKeys");
-	QStringList sidesKeys = c_settings->allKeys();
+	c_settings->beginGroup("MotorsKeys");
+	QStringList motorsKeys = c_settings->allKeys();
 	c_settings->endGroup();
 
 	QString DevPath  = c_settings->value("DevPath").toString();
@@ -83,16 +75,12 @@ void CarCtrl::initSides()
 	I2cConnection* i2cCon = new I2cConnection(DevPath,DevId); //one i2c connection for everybody
 	c_i2cCon = i2cCon;
 
-	for (int i = 0; i < sidesKeys.size(); ++i) 
+	for (int i = 1; i <= motorsKeys.size(); ++i) 
 	{
-		QString name = sidesKeys[i];
-		c_settings->beginGroup(name);
-		char Center = (char) (c_settings->value("CentralWheel").toInt());
-		char Edge = (char) c_settings->value("EdgesWheels").toInt();
+		QString name = motorsKeys[i];
 		int Period = c_settings->value("Period").toInt();
-		Side* side = new Side(Center,Edge,Period,i2cCon);
-		c_sides[name] = side;
-		c_settings->endGroup();
+		Motor* motor = new Motor(i,Period,i2cCon);
+		c_motors[name] = motor;
 	}
 
 }
@@ -108,10 +96,10 @@ void CarCtrl::EmergencyStop()
 }
 void CarCtrl::Stop()
 {
-	Side* side;
-	foreach (side, c_sides) 
+	Motor* motor;
+	foreach (motor, c_motors) 
 	{
-		side->setPower(0);
+		motor->setPower(0);
 	}
 }
 
@@ -153,7 +141,7 @@ void CarCtrl::NetworkRead()
 }
 
 void CarCtrl::keyPressEvent(QKeyEvent* event) 
-{
+{	
     printf("\nkey event from board: %d", event->key());
     qDebug() << "Pressed";
     if (c_StopFlag == 0) EmergencyStop(); else ResumeMoving(); 
@@ -164,47 +152,38 @@ void CarCtrl::Run(QStringList cmd)
 {
 	qDebug() << cmd;
 
-	QString commandName = cmd.at(0).trimmed();
-	if (commandName == "pad")
-	{
-		if (cmd.at(1).trimmed().toInt() == 1)
-		{
-			if (cmd.at(2).trimmed() == "up") 
-				Stop();
-			else 
-				{
-					int x = cmd.at(2).trimmed().toInt();
-					int y =	cmd.at(3).trimmed().toInt();
-					int right =  y - x;  //check and fix it
-					int left = y + x;
-					if (c_StopFlag == 0)
-					{
-						c_sides["left"]->setPower(left);
-						c_sides["right"]->setPower(right);
-					}
-				}
-		}
-	}
-	else if (commandName == "btn")
-			{ 
-				if (cmd.at(1).trimmed().toInt() == 1)
-					if (c_StopFlag == 1) ResumeMoving();
-					else EmergencyStop();
-			}
-	else if (commandName == "wheel")
-			{
-				int left = 80 + cmd.at(1).trimmed().toInt(); // check and fix it
-				int right = 80 - cmd.at(1).trimmed().toInt();
-				if (c_StopFlag == 0)
-					{
-						c_sides["left"]->setPower(left);
-						c_sides["right"]->setPower(right);
-					}
-			}
-	else
-		{
-			qDebug() << "Unknown command" ;
-		}
-		//qDebug() << "Request" << command;
+	c_motors["First"]->setPower(-100);
+	c_motors["Second"]->setPower(100);
+	c_motors["Third"]->setPower(-100);
+	c_motors["Fourth"]->setPower(100);
+	
+	// QString commandName = cmd.at(0).trimmed();
+	// if (commandName == "pad")
+	// {
+	// 	if (cmd.at(1).trimmed().toInt() == 1)
+	// 	{
+	// 		if (cmd.at(2).trimmed() == "up") 
+	// 			Stop();
+	// 		else 
+	// 			{
+					
+	// 			}
+	// 	}
+	// }
+	// else if (commandName == "btn")
+	// 		{ 
+	// 			if (cmd.at(1).trimmed().toInt() == 1)
+	// 				if (c_StopFlag == 1) ResumeMoving();
+	// 				else EmergencyStop();
+				
+	// 		}
+	// else if (commandName == "wheel")
+	// 		{
+				
+	// 		}
+	// else
+	// 	{
+	// 		qDebug() << "Unknown command" ;
+	// 	}
 	
 }
