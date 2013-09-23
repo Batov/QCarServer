@@ -203,7 +203,7 @@ void CarCtrl::Run(QStringList cmd)
 			}
 	else if (commandName == "read")
 			{
-				qDebug() << c_Sen->getValue(cmd.at(1).trimmed().toInt());
+				qDebug() << "returned value" + c_Sen->getValue(cmd.at(1).trimmed().toInt());
 			}
 	else if (commandName == "close")
 			{
