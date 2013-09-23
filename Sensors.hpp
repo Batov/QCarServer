@@ -8,7 +8,7 @@ class Sensors : public QObject
 public:
     Sensors(I2cConnection* i2cCon);
 	int getValue(int number);
-	char getRegister(int number);
+	unsigned char getRegister(int number);
 public slots:
 
 signals:

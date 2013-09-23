@@ -203,7 +203,7 @@ void CarCtrl::Run(QStringList cmd)
 			}
 	else if (commandName == "read")
 			{
-				qDebug() << "returned value" + c_Sen->getValue(cmd.at(1).trimmed().toInt());
+				printf("%d\n",c_Sen->getValue(cmd.at(1).trimmed().toInt()));  
 			}
 	else if (commandName == "close")
 			{
@@ -213,6 +213,4 @@ void CarCtrl::Run(QStringList cmd)
 		{
 			qDebug() << "Unknown command" ;
 		}
-		//qDebug() << "Request" << command;
-	
 }
