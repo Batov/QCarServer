@@ -20,17 +20,13 @@ TARGET =        QCarServer
 SOURCES +=      \
     Main.cpp \
     I2cConnection.cpp \
-    CarCtrl.cpp \
-    SideCtrl.cpp \	
-    MotorCtrl.cpp \
-    Sensors.cpp
+    GunCtrl.cpp \
+    MotorCtrl.cpp 
 
 HEADERS +=      \
     I2cConnection.hpp \
-    CarCtrl.hpp \
-    SideCtrl.hpp \
-    MotorCtrl.hpp \ 
-    Sensors.hpp
+    GunCtrl.hpp \
+    MotorCtrl.hpp \
 
 FORMS +=        
 
