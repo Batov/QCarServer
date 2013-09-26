@@ -3,7 +3,6 @@
 #include <QObject>
 #include <linux/types.h>
 #include <sys/ioctl.h>
-#include <linux/i2c-dev.h>
 
 class I2cConnection : public QObject
 {
@@ -27,8 +26,10 @@ protected:
 
 #define I2C_SMBUS_BLOCK_MAX 32
 #define I2C_SMBUS_READ 1
+#define I2C_SMBUS_WRITE     0
 #define I2C_SMBUS_WORD_DATA     32
 #define I2C_SMBUS    0x0720
+#define I2C_SMBUS_BYTE_DATA     2
 
 union i2c_smbus_data 
 {
@@ -36,6 +37,6 @@ union i2c_smbus_data
         __u16 word;
         __u8 block[I2C_SMBUS_BLOCK_MAX + 2]; /* block[0] is used for length */
                                                     /* and one more for PEC */
- };
+};
 
 

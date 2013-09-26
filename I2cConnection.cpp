@@ -4,13 +4,16 @@
 #include <errno.h>
 #include <linux/types.h>
 #include <linux/i2c-dev.h>
+
+
 #include <QtGui>
 
 #include "I2cConnection.hpp"
 
 static inline __s32 i2c_smbus_access(int file, char read_write, __u8 command, 
                                       int size, union i2c_smbus_data *data)
-{
+
+{        
         struct i2c_smbus_ioctl_data args;
  
         args.read_write = read_write;
@@ -95,11 +98,11 @@ int I2cConnection::SendData(char* data, char size)
 {
   if (size == 2) 
   {
-    i2c_smbus_write_byte_data(i_BusFd, data[0],data[1]);
+    i2c_smbus_write_byte_data(i_BusFd, data[0], data[1]);
   }
   else
   {
-    i2c_smbus_write_byte_data(i_BusFd, data[0],data[1] | (data[2] << 8)]; 
+    i2c_smbus_write_word_data(i_BusFd, data[0], data[1] | (data[2] << 8)); 
   }
 
 return 0;
@@ -108,6 +111,7 @@ return 0;
 uint16_t I2cConnection::ReceiveData(uint8_t reg)
 {  
 
+  printf("register = %x\n",reg);
   int rest = i2c_smbus_read_word_data(i_BusFd,reg);
   printf("0x%x\n",rest);
 
