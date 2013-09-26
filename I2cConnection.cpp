@@ -2,9 +2,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <linux/types.h>
 #include <linux/i2c-dev.h>
-
 
 #include <QtGui>
 
@@ -71,13 +69,13 @@ int I2cConnection::OpenConnection()
     		i_BusFd = -1;
     		return res;
   		}
-
   if (ioctl(i_BusFd, I2C_SLAVE, i_DevId) != 0)
   {
     res = errno;
     fprintf(stdout, "ioctl(%d, I2C_SLAVE, %d) failed: %d\n", i_BusFd, i_DevId, res);
     return res;
   }
+
   	return 0;
 }
 
@@ -110,10 +108,8 @@ return 0;
 
 uint16_t I2cConnection::ReceiveData(uint8_t reg)
 {  
-
-  printf("register = %x\n",reg);
+  printf("register = 0x%x\n",reg);
   int rest = i2c_smbus_read_word_data(i_BusFd,reg);
   printf("0x%x\n",rest);
-
   return rest;
 }

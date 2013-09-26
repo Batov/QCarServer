@@ -2,7 +2,6 @@
 
 #include <QObject>
 #include <linux/types.h>
-#include <sys/ioctl.h>
 
 class I2cConnection : public QObject
 {
@@ -27,8 +26,7 @@ protected:
 #define I2C_SMBUS_BLOCK_MAX 32
 #define I2C_SMBUS_READ 1
 #define I2C_SMBUS_WRITE     0
-#define I2C_SMBUS_WORD_DATA     32
-#define I2C_SMBUS    0x0720
+#define I2C_SMBUS_WORD_DATA     3
 #define I2C_SMBUS_BYTE_DATA     2
 
 union i2c_smbus_data 
