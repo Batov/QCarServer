@@ -1,6 +1,7 @@
 #include <QtCore/QStringList>
 #include <QtNetwork/QTcpSocket>
 #include <QtGui/QKeyEvent>
+#include <QTimer>
 
 #include <unistd.h>
 #include <linux/input.h>
@@ -8,15 +9,16 @@
 
 #include "GunCtrl.hpp"
 
-const int zeroPoint = 1505000;
-const int amplitude = 200000;
-int setDutyNs(int nspeed){return zeroPoint + (nspeed * amplitude) / 100;}
+//const int zeroPoint = 1505000;
+//const int amplitude = 200000;
+//int setDutyNs(int nspeed){return zeroPoint + (nspeed * amplitude) / 100;}
 
 GunCtrl::GunCtrl() :
 	c_Server(),
 	lift(),
 	shot(),
-	ShotFlag(0)
+	reload(),
+    PlayFlag(0)
 {
 	initSettings();
 	printf("ConnectionPort = %d\n", c_settings->value("ConnectionPort").toInt());
@@ -32,7 +34,7 @@ GunCtrl::~GunCtrl()
 {	
 	Disconnected(); 
 	c_i2cCon->CloseConnection();
-	run->write("0");
+    run->write("0");
     run->close();
     period_ns->close();
     duty_ns->close();
@@ -77,6 +79,9 @@ void GunCtrl::initMotor()
 
 	Motor* theshot = new Motor(2,20000,i2cCon);
 	shot = theshot;
+
+	Motor* therel = new Motor(3,20000,i2cCon);
+	reload = therel;
 }
 
 void GunCtrl::initServo()
@@ -102,20 +107,8 @@ void GunCtrl::initServo()
     period_ns->flush();
 }
 
-void GunCtrl::Shot()
-{
-	ShotFlag = 1;
-	shot->setPower(100);
-}
-void GunCtrl::StopShot()
-{
-	ShotFlag = 0;
-	shot->setPower(0);
-}
-
 void GunCtrl::Connection()
 {
-	Stop();
 	if (c_Connection->isValid()) qDebug() << "Replacing existing connection";
 	c_Connection = c_Server.nextPendingConnection();
 	qDebug() << "Accepted new connection";
@@ -126,7 +119,6 @@ void GunCtrl::Connection()
 
 void GunCtrl::Disconnected()
 {
-	Stop();
 	qDebug() << "Disconnected, STOP MOTORS!";
 	c_Connection->disconnectFromHost();
 }
@@ -145,59 +137,100 @@ void GunCtrl::NetworkRead()
 		char data[100];
 		c_Connection->readLine(data, 100);
 		QString command(data);
-		Run(command.split(" ", QString::SkipEmptyParts));
+        NetCommand(command.split(" ", QString::SkipEmptyParts));
 	}
 
 }
 
-void GunCtrl::Run(QStringList cmd)
+void GunCtrl::NetCommand(QStringList cmd)
 {
 	qDebug() << cmd;
 
 	QString commandName = cmd.at(0).trimmed();
-	if (commandName == "pad")
-	{
-		if (cmd.at(1).trimmed().toInt() == 1)
-		{
-			if (cmd.at(2).trimmed() == "up") 
-				{}
-			else 
-				{
-					lift->setPower(cmd.at(3).trimmed().toInt());
-				}
-		}
-		if (cmd.at(1).trimmed().toInt() == 2)
-		{
-			if (cmd.at(2).trimmed() == "up") 
-			{}
-			else 
-				{
-				duty_ns->write(QString::number(setDutyNs(cmd.at(3).trimmed().toInt())).toStdString().data());
-        		run->write("1");
-        		duty_ns->flush();
-        		run->flush();	
-				}
-		}
-	}
-	else if (commandName == "btn")
+	if (commandName == "btn")
 			{ 
-				if (cmd.at(1).trimmed().toInt() == 1)
-					if (ShotFlag) 
-						StopShot();
-					else
-						Shot();		
+        if (cmd.at(1).trimmed().toInt() == 1)
+            if (PlayFlag == 0)
+                    Run();
 			}
 	else if (commandName == "close")
-			{
-				run->close();
-    			period_ns->close();
-    			duty_ns->close();
-    			request->write("0");
-    			request->close();
-			}
+	{
+		run->write("0");
+        //  Do we need to clean other files?
+        run->close();
+        period_ns->close();
+        duty_ns->close();
+        request->write("0");
+        request->close();
+        //  Delete after closing
+        delete run;
+        delete duty_ns;
+        delete period_ns;
+        delete request;
+	}
 	else
 		{
 			qDebug() << "Unknown command" ;
 		}
 
 }
+void GunCtrl::StopShot()
+{
+    shot->setPower(0);
+    PlayFlag = 0;
+}
+
+void GunCtrl::StartShot()
+{
+    shot->setPower(100);
+    QTimer::singleShot(3000, this, SLOT(StopShot()));
+}
+
+void GunCtrl::StopReload()
+{
+
+}
+
+void GunCtrl::StartReload()
+{
+   reload->setPower(100);
+}
+
+
+void GunCtrl::Startlift()
+{
+	SetServo(1600000);
+
+	qDebug() << "Startlift";
+    lift->setPower(-60);
+    
+}
+
+void GunCtrl::Stoplift()
+{
+	qDebug() << "Stoplift";
+    lift->setPower(0);
+    reload->setPower(0);
+    SetServo(1800000);
+    QTimer::singleShot(8000, this, SLOT(StartShot()));
+
+}
+
+void GunCtrl::SetServo(int k)
+{
+    duty_ns->write(QString::number(k).toStdString().data());
+    run->write("1");
+    duty_ns->flush();
+    run->flush();
+}
+
+void GunCtrl::Run()
+{
+    PlayFlag = 1;
+    qDebug() << "Run";
+    Startlift();
+    StartReload();
+    QTimer::singleShot(8000, this, SLOT(Stoplift()));
+}
+
+

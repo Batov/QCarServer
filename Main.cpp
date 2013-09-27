@@ -3,13 +3,13 @@
 #include <QWSServer>
 #include <QApplication>
 
-#include "CarCtrl.hpp"
+#include "GunCtrl.hpp"
 
 int main(int argc, char *argv[])
 {
 	QApplication App(argc, argv);
 
-	CarCtrl ctrl;
+    GunCtrl ctrl;
 	ctrl.show();
 	Q_UNUSED(ctrl)
 	return App.exec();

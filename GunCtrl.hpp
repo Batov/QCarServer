@@ -28,10 +28,15 @@ public:
 
 public slots:
 	void Responce(const QByteArray& a);
-	void StopShot();
-	void Shot();
-	void Stop();
-	void Run(QStringList);
+    void NetCommand(QStringList);
+	void Run();
+    void Startlift();
+    void Stoplift();
+    void SetServo(int k);
+    void StartReload();
+    void StopReload();
+    void StartShot();
+    void StopShot();
 
 protected slots:
 	void Connection();
@@ -39,16 +44,17 @@ protected slots:
 	void NetworkRead();
 	void initMotor();
 	void initSettings();
-	void initServo();
+    void initServo();
 
 signals:
 
 protected:
 
-	char ShotFlag;
+    char PlayFlag;
 
 	Motor *lift;
 	Motor *shot;
+	Motor *reload;
 
 	QFile * request;        //  1 - open others for write, 0 - close interface
     QFile * period_ns;      //  Signal frequency
