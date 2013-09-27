@@ -9,9 +9,6 @@
 
 #include "GunCtrl.hpp"
 
-//const int zeroPoint = 1505000;
-//const int amplitude = 200000;
-//int setDutyNs(int nspeed){return zeroPoint + (nspeed * amplitude) / 100;}
 
 GunCtrl::GunCtrl() :
 	c_Server(),
@@ -180,7 +177,7 @@ void GunCtrl::NetCommand(QStringList cmd)
 				{
 					if (StageofPlay == 2)
 					{
-						SetServo(1800000); //manual value
+						SetServo(cmd.at(3).trimmed().toInt()); 
 					}
 				}
 				else
@@ -216,34 +213,36 @@ void GunCtrl::StopReload()
 	StartShot();
 }
 
-void GunCtrl::StartReload(int time)
+void GunCtrl::StartReload(int rtime)
 {
    reload->setPower(100);
-   QTimer::singleShot(time, this, SLOT(StopReload())); //need fix it!!! time is not a time!!!
-
+   int thetime = 5000 + rtime * 50; 
+   QTimer::singleShot(thetime, this, SLOT(StopReload()));
+   printf("Start Reload time= %d ms\n",thetime);
 }
 
 
 void GunCtrl::Startlift()
 {
+	int rtime = 8000;
 	StageofPlay = 1;
 	SetServo(1600000);
-	qDebug() << "Startlift";
     lift->setPower(-100);
-    QTimer::singleShot(8000, this, SLOT(Stoplift()));
+    QTimer::singleShot(rtime, this, SLOT(Stoplift()));
+    printf("Start Lift time=%d ms \n",rtime); 
     
 }
 
 void GunCtrl::Stoplift()
 {
-	qDebug() << "Stoplift";
     lift->setPower(0);
     StageofPlay = 2;
 }
 
 void GunCtrl::SetServo(int k)
 {
-    duty_ns->write(QString::number(k).toStdString().data());
+	int ns = 1950000 + k * 3500;
+    duty_ns->write(QString::number(ns).toStdString().data());
     run->write("1");
     duty_ns->flush();
     run->flush();
