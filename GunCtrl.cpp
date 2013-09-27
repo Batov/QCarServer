@@ -18,7 +18,8 @@ GunCtrl::GunCtrl() :
 	lift(),
 	shot(),
 	reload(),
-    PlayFlag(0)
+    StageofPlay(0),
+    LastTimeofLoad(0)
 {
 	initSettings();
 	printf("ConnectionPort = %d\n", c_settings->value("ConnectionPort").toInt());
@@ -150,24 +151,47 @@ void GunCtrl::NetCommand(QStringList cmd)
 	if (commandName == "btn")
 			{ 
         if (cmd.at(1).trimmed().toInt() == 1)
-            if (PlayFlag == 0)
-                    Run();
+            if (StageofPlay == 0)
+                    Startlift();
+        if (cmd.at(1).trimmed().toInt() == 2)
+        	if (StageofPlay == 2)
+        	{
+        		StartReload(LastTimeofLoad); //manual value
+        	}
 			}
 	else if (commandName == "close")
-	{
-		run->write("0");
-        //  Do we need to clean other files?
-        run->close();
-        period_ns->close();
-        duty_ns->close();
-        request->write("0");
-        request->close();
-        //  Delete after closing
-        delete run;
-        delete duty_ns;
-        delete period_ns;
-        delete request;
+		{
+			run->write("0");
+	        run->close();
+	        period_ns->close();
+	        duty_ns->close();
+	        request->write("0");
+	        request->close();
+	        delete run;
+	        delete duty_ns;
+	        delete period_ns;
+	        delete request;
 	}
+	else if (commandName == "pad")
+		{
+			if (cmd.at(2).trimmed() != "up")
+			{
+				if (cmd.at(1).trimmed().toInt() == 1)
+				{
+					if (StageofPlay == 2)
+					{
+						SetServo(1800000); //manual value
+					}
+				}
+				else
+				{
+					if (StageofPlay == 2)
+					{
+						LastTimeofLoad = cmd.at(3).trimmed().toInt();
+					}
+				}
+			} 
+		}
 	else
 		{
 			qDebug() << "Unknown command" ;
@@ -177,32 +201,36 @@ void GunCtrl::NetCommand(QStringList cmd)
 void GunCtrl::StopShot()
 {
     shot->setPower(0);
-    PlayFlag = 0;
+    StageofPlay = 0;
 }
 
 void GunCtrl::StartShot()
 {
     shot->setPower(100);
-    QTimer::singleShot(3000, this, SLOT(StopShot()));
+    QTimer::singleShot(2000, this, SLOT(StopShot()));
 }
 
 void GunCtrl::StopReload()
 {
-
+	reload->setPower(0);
+	StartShot();
 }
 
-void GunCtrl::StartReload()
+void GunCtrl::StartReload(int time)
 {
    reload->setPower(100);
+   QTimer::singleShot(time, this, SLOT(StopReload())); //need fix it!!! time is not a time!!!
+
 }
 
 
 void GunCtrl::Startlift()
 {
+	StageofPlay = 1;
 	SetServo(1600000);
-
 	qDebug() << "Startlift";
-    lift->setPower(-60);
+    lift->setPower(-100);
+    QTimer::singleShot(8000, this, SLOT(Stoplift()));
     
 }
 
@@ -210,10 +238,7 @@ void GunCtrl::Stoplift()
 {
 	qDebug() << "Stoplift";
     lift->setPower(0);
-    reload->setPower(0);
-    SetServo(1800000);
-    QTimer::singleShot(8000, this, SLOT(StartShot()));
-
+    StageofPlay = 2;
 }
 
 void GunCtrl::SetServo(int k)
@@ -223,14 +248,3 @@ void GunCtrl::SetServo(int k)
     duty_ns->flush();
     run->flush();
 }
-
-void GunCtrl::Run()
-{
-    PlayFlag = 1;
-    qDebug() << "Run";
-    Startlift();
-    StartReload();
-    QTimer::singleShot(8000, this, SLOT(Stoplift()));
-}
-
-

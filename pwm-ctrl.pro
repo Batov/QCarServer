@@ -16,7 +16,7 @@ contains($$[QT_VERSION_MAJOR],5) {
     QT += widgets
 }
 
-TARGET =        QCarServer
+TARGET =        QGunServer
 SOURCES +=      \
     Main.cpp \
     I2cConnection.cpp \

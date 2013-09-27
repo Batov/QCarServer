@@ -29,11 +29,10 @@ public:
 public slots:
 	void Responce(const QByteArray& a);
     void NetCommand(QStringList);
-	void Run();
     void Startlift();
     void Stoplift();
     void SetServo(int k);
-    void StartReload();
+    void StartReload(int time);
     void StopReload();
     void StartShot();
     void StopShot();
@@ -50,7 +49,9 @@ signals:
 
 protected:
 
-    char PlayFlag;
+	int StageofPlay;
+	int LastTimeofLoad;
+    const int loadPosition = 1600000;
 
 	Motor *lift;
 	Motor *shot;
