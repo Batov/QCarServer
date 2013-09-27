@@ -180,11 +180,13 @@ void GunCtrl::NetCommand(QStringList cmd)
 						SetServo(cmd.at(3).trimmed().toInt()); 
 					}
 				}
-				else
+			else
 				{
 					if (StageofPlay == 2)
 					{
 						LastTimeofLoad = cmd.at(3).trimmed().toInt();
+						int thetime = 5000 + LastTimeofLoad * 50; 
+						printf("Time of Load = %d ms ?\n", thetime);
 					}
 				}
 			} 
@@ -213,10 +215,9 @@ void GunCtrl::StopReload()
 	StartShot();
 }
 
-void GunCtrl::StartReload(int rtime)
+void GunCtrl::StartReload(int thetime)
 {
    reload->setPower(100);
-   int thetime = 5000 + rtime * 50; 
    QTimer::singleShot(thetime, this, SLOT(StopReload()));
    printf("Start Reload time= %d ms\n",thetime);
 }
