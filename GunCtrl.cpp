@@ -180,7 +180,7 @@ void GunCtrl::NetCommand(QStringList cmd)
 						SetServo(cmd.at(3).trimmed().toInt()); 
 					}
 				}
-			else
+				else
 				{
 					if (StageofPlay == 2)
 					{
@@ -227,7 +227,7 @@ void GunCtrl::Startlift()
 {
 	int rtime = 8000;
 	StageofPlay = 1;
-	SetServo(1600000);
+	SetServo(-100);
     lift->setPower(-100);
     QTimer::singleShot(rtime, this, SLOT(Stoplift()));
     printf("Start Lift time=%d ms \n",rtime); 
